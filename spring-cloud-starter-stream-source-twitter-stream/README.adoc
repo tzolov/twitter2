@@ -1,0 +1,58 @@
+//tag::ref-doc[]
+= Twitter Stream Source
+
+Real-time Tweet streaming https://developer.twitter.com/en/docs/tweets/filter-realtime/api-reference/post-statuses-filter.html[Filter] and https://developer.twitter.com/en/docs/tweets/sample-realtime/overview/GET_statuse_sample[Sample] APIs support.
+
+* The `Filter API` returns public statuses that match one or more filter predicates.
+Multiple parameters may be specified which allows most clients to use a single connection to the Streaming API.
+The `track`, `follow`, and `locations` fields should be considered to be combined with an OR operator.
+Queries with `track=foo` and `follow=1234` will returns Tweets matching `foo` OR created by user `1234`.
+
+* The `Sample API` returns a small random sample of all public statuses.
+The Tweets returned by the default access level are the same, so if two different clients connect to this endpoint, they will see the same Tweets.
+
+The default access level allows up to 400 track keywords, 5,000 follow user Ids and 25 0.1-360 degree location boxes.
+
+== Options
+
+//tag::configuration-properties[]
+$$twitter.stream.filter.count$$:: $$Indicates the number of previous statuses to stream before transitioning to the live stream.$$ *($$Integer$$, default: `$$0$$`)*
+$$twitter.stream.filter.filter-level$$:: $$The filter level limits what tweets appear in the stream to those with a minimum filterLevel attribute value. One of either none, low, or medium.$$ *($$FilterLevel$$, default: `$$<none>$$`)*
+$$twitter.stream.filter.follow$$:: $$Specifies the users, by ID, to receive public tweets from.$$ *($$List<Long>$$, default: `$$<none>$$`)*
+$$twitter.stream.filter.language$$:: $$Specifies the tweets language of the stream$$ *($$List<String>$$, default: `$$<none>$$`)*
+$$twitter.stream.filter.locations$$:: $$Locations to track. Internally represented as 2D array. Bounding box is invalid: 52.38, 4.90, 51.51, -0.12.  The first pair must be the SW corner of the box$$ *($$List<BoundingBox>$$, default: `$$<none>$$`)*
+$$twitter.stream.filter.track$$:: $$Specifies keywords to track.$$ *($$List<String>$$, default: `$$<none>$$`)*
+$$twitter.stream.type$$:: $$<documentation missing>$$ *($$StreamType$$, default: `$$<none>$$`, possible values: `sample`,`filter`,`firehose`,`linkn`)*
+//end::configuration-properties[]
+
+//end::ref-doc[]
+
+== Build
+
+Build involves two-stages. First build the apps and generate the binder specific app starters projects:
+```
+$ ./mvnw clean install -PgenerateApps
+```
+
+You can find the corresponding binder based projects in the `apps` subfolder. You can then cd into the apps folder:
+
+```
+$ cd apps
+```
+and build all binder projects
+```
+$ ./mvnw clean package
+```
+
+== Examples
+
+```
+java -jar twitter-stream-source.jar ... use the properties TODO
+```
+
+And here is a example pipeline that uses twitter-stream:
+
+```
+twitter-stream-stream= TODO
+```
+

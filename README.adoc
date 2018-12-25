@@ -1,0 +1,65 @@
+# Spring Cloud Stream Twitter Applications
+
+Spring Cloud Stream Applications that build on the http://twitter4j.org/en/[Twitter4J] to enable the most useful https://developer.twitter.com/en/docs[Twitter Standard APIs] features.
+Collection of sources allow consuming streams of `statuses`, `timelines`, `users`, `trends` and `direct messages`.
+Couple of twitter processors allow you to introspect Twitter's places and geo locations.
+Provided sink applications allow to update tweet statuses an send direct messages.
+
+---
+
+### twitter-common
+Common configuration and utils used in all twitter apps.
+
+include::spring-cloud-starter-stream-common-twitter/README.adoc[]
+
+---
+
+### twitter-update sink
+Updates the authenticating user's current text (e.g Tweeting).
+
+include::spring-cloud-starter-stream-sink-twitter-update/README.adoc[]
+
+---
+
+### twitter-search source
+Returns a collection of relevant Tweets matching a specified query.
+
+include::spring-cloud-starter-stream-source-twitter-search/README.adoc[]
+
+---
+
+### twitter-stream source
+Real-time Tweet Streaming APIs such as the https://developer.twitter.com/en/docs/tweets/filter-realtime/api-reference/post-statuses-filter.html[Filter] and https://developer.twitter.com/en/docs/tweets/sample-realtime/overview/GET_statuse_sample[Sample] APIs.
+
+include::spring-cloud-starter-stream-source-twitter-stream/README.adoc[]
+
+---
+
+### twitter-message source
+*Description*: TODO
+
+include::spring-cloud-starter-stream-source-twitter-message/README.adoc[]
+
+---
+
+### twitter-message sink
+Send Direct Messages to a specified user from the authenticating user.
+
+include::spring-cloud-starter-stream-sink-twitter-message/README.adoc[]
+
+---
+
+### twitter-geo processor
+Leverages the https://developer.twitter.com/en/docs/geo/places-near-location/overview[Geo API] to retrieves Twitter place information based on query parameters such as (`latitude`, `longitude`) pair, an `IP` address, or a place `name`.
+
+include::spring-cloud-starter-stream-processor-twitter-geo/README.adoc[]
+
+---
+
+### twitter-timeline source
+*Description*: TODO
+
+include::spring-cloud-starter-stream-source-twitter-timeline/README.adoc[]
+
+---
+

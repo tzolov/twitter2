@@ -1,0 +1,44 @@
+//tag::ref-doc[]
+= Twitter Common Configurations
+
+All applications need to be authenticated with `OAuth`.
+To authenticate with your Twitter account you need to provide the properties:
+
+[source,bash]
+----
+twitter.connection.consumerKey=...
+twitter.connection.consumerSecret=...
+twitter.connection.accessToken=...
+twitter.connection.accessTokenSecret=...
+----
+
+[TIP]
+====
+To obtain Twitter Consumer Key (API Key) and Consumer Secret follow the steps below:
+
+* Go to https://dev.twitter.com/apps/new and log in, if necessary
+* Supply the necessary required fields, accept the Terms Of Service, and solve the CAPTCHA.
+* Submit the form
+* Go to the API Keys tab, there you will find your Consumer key and Consumer secret keys.
+* Copy the consumer key (API key) and consumer secret from the screen into our application
+====
+
+== Options
+
+//tag::configuration-properties[]
+$$twitter.connection.access-token$$:: $$Your Twitter token$$ *($$String$$, default: `$$<none>$$`)*
+$$twitter.connection.access-token-secret$$:: $$Your Twitter token secret$$ *($$String$$, default: `$$<none>$$`)*
+$$twitter.connection.consumer-key$$:: $$Your Twitter key$$ *($$String$$, default: `$$<none>$$`)*
+$$twitter.connection.consumer-secret$$:: $$Your Twitter secret$$ *($$String$$, default: `$$<none>$$`)*
+$$twitter.connection.debug-enabled$$:: $$Enables Twitter4J debug mode.$$ *($$Boolean$$, default: `$$false$$`)*
+$$twitter.connection.poll-interval$$:: $$Twitter APIs poll interval. Applicable for the non streaming Twitter APIs$$ *($$Duration$$, default: `$$1m$$`)*
+//end::configuration-properties[]
+
+//end::ref-doc[]
+
+== Configuration
+
+`TwitterConnectionConfiguration` exposes the `Function<Message<?>, Message<?>> normalizeStringPayload()`.
+It allows converting byte[] payloads of `text` or `json` content types into `String` such.
+
+

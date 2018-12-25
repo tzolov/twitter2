@@ -1,0 +1,91 @@
+//tag::ref-doc[]
+= Twitter Geo Processor
+
+Processor based on the https://developer.twitter.com/en/docs/geo/places-near-location/overview[Geo API] that retrieves Twitter place information based on query parameters such as `latitude` and a `longitude` pair, an `IP` address, or a place `name`.
+
+There are two types for geo search queries `search` and `reverse` controlled by the `twitter.geo.search.type` property.
+
+* reverse - Given a latitude and a longitude, searches for up to 20 places that can be used as a `placeId` when updating a status.
+This request is an informative call and will deliver generalized results about geography.
+
+* search - Search for places that can be attached to a statuses/update. Given a latitude and a longitude pair, an IP address, or a name, this request will return a list of all the valid places that can be used as the place_id when updating a status.
+
+Conceptually, a query can be made from the user’s location, retrieve a list of places, have the user validate the location he or she is at, and then send the ID of this location with a call to POST statuses/update.
+
+This is the recommended method to use find places that can be attached to statuses/update. Unlike GET geo/reverse_geocode which provides raw data access, this endpoint can potentially re-order places with regards to the user who is authenticated. This approach is also preferred for interactive place matching with the user.
+
+Some parameters in this method are only required based on the existence of other parameters. For instance, “lat” is required if “long” is provided, and vice-versa. Authentication is recommended, but not required with this method.
+
+NOTE: Limits: 15 requests / 15-min window (user auth).
+
+== Options
+
+//tag::configuration-properties[]
+$$twitter.geo.accuracy$$:: $$Sets a hint on the "region" in which to search. If a number, then this is a radius in meters, but it can also take a string that is suffixed with ft to specify feet. If this is not passed in, then it is assumed to be 0m. If coming from a device, in practice, this value is whatever accuracy the device has measuring its location (whether it be coming from a GPS, WiFi triangulation, etc.).$$ *($$String$$, default: `$$<none>$$`)*
+$$twitter.geo.granularity$$:: $$Minimal granularity of data to return. If this is not passed in, then neighborhood is assumed. City can also be passed.$$ *($$String$$, default: `$$<none>$$`)*
+$$twitter.geo.location.lat$$:: $$User's lat$$ *($$Expression$$, default: `$$<none>$$`)*
+$$twitter.geo.location.lon$$:: $$User's lon$$ *($$Expression$$, default: `$$<none>$$`)*
+$$twitter.geo.max-results$$:: $$Hints for the number of results to return. This does not guarantee that the number of results returned will equal max_results, but instead informs how many "nearby" results to return.$$ *($$Integer$$, default: `$$-1$$`)*
+$$twitter.geo.search.ip$$:: $$An IP address. Used when attempting to fix geolocation based off of the user's IP address. Applicable only for "search" geo type.$$ *($$Expression$$, default: `$$<none>$$`)*
+$$twitter.geo.search.query$$:: $$Query expression to filter Places in search results.$$ *($$Expression$$, default: `$$<none>$$`)*
+$$twitter.geo.type$$:: $$Geo search API type: reverse or search.$$ *($$GeoType$$, default: `$$<none>$$`, possible values: `reverse`,`search`)*
+//end::configuration-properties[]
+
+//end::ref-doc[]
+
+== Build
+
+Build involves two-stages. First build the apps and generate the binder specific app starters projects:
+```
+$ ./mvnw clean install -PgenerateApps
+```
+
+You can find the corresponding binder based projects in the `apps` subfolder. You can then cd into the apps folder:
+
+```
+$ cd apps
+```
+and build all binder projects
+```
+$ ./mvnw clean package
+```
+
+== Embed or Compose Twitter Geo processor
+
+Leveraging the Spring Cloud Function composability, you can compose the Geo Processor in your boot app like this:
+
+[source,Java]
+----
+@SpringBootApplication
+@EnableBinding(Processor.class)
+@Import({ TwitterConnectionConfiguration.class, TwitterGeoProcessorFunctionConfiguration.class })
+public class MyTwitterGeoProcessorBootApp {
+
+	public static void main(String[] args) {
+		SpringApplication.run(MyFunctionBootApp.class,
+		    "--spring.cloud.stream.function.definition=toGeoQuery|searchPlaces|toJson");
+	}
+}
+----
+
+== Examples
+
+[source,bash]
+----
+java -jar twitter-geo-processor.jar
+  --twitter.geo.search.ip='127.0.0.1'
+  --twitter.geo.search.query=payload.toUpperCase()
+
+  --twitter.connection.consumerKey= ...
+  --twitter.connection.consumerSecret= ...
+  --twitter.connection.accessToken= ...
+  --twitter.connection.accessTokenSecret= ...
+
+----
+
+And here is a example pipeline that uses twitter-geo:
+
+```
+twitter-geo-stream= TODO
+```
+
