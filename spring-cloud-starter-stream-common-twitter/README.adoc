@@ -31,7 +31,7 @@ $$twitter.connection.access-token-secret$$:: $$Your Twitter token secret$$ *($$S
 $$twitter.connection.consumer-key$$:: $$Your Twitter key$$ *($$String$$, default: `$$<none>$$`)*
 $$twitter.connection.consumer-secret$$:: $$Your Twitter secret$$ *($$String$$, default: `$$<none>$$`)*
 $$twitter.connection.debug-enabled$$:: $$Enables Twitter4J debug mode.$$ *($$Boolean$$, default: `$$false$$`)*
-$$twitter.connection.poll-interval$$:: $$Twitter APIs poll interval. Applicable for the non streaming Twitter APIs$$ *($$Duration$$, default: `$$1m$$`)*
+$$twitter.connection.poll-pollInterval$$:: $$Twitter APIs poll pollInterval. Applicable for the non streaming Twitter APIs$$ *($$Duration$$, default: `$$1m$$`)*
 //end::configuration-properties[]
 
 //end::ref-doc[]

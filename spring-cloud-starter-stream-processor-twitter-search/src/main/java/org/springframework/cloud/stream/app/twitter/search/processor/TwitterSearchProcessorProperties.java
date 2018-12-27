@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.stream.app.twitter.search.source;
+package org.springframework.cloud.stream.app.twitter.search.processor;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Positive;
 
 import twitter4j.Query;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.expression.Expression;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.validation.annotation.Validated;
 
 /**
@@ -32,40 +30,41 @@ import org.springframework.validation.annotation.Validated;
  */
 @ConfigurationProperties("twitter.search")
 @Validated
-public class TwitterSearchSourceProperties {
+public class TwitterSearchProcessorProperties {
+
+	private static final Expression DEFAULT_EXPRESSION = new SpelExpressionParser().parseExpression("payload");
 
 	/**
 	 * Search tweets by search query string
 	 */
 	@NotNull
-	@NotEmpty
-	private String query;
+	private Expression query = DEFAULT_EXPRESSION;
+	;
 
 	/**
-	 * Number of pages (e.g. requests) to search backwards (from most recent to the oldest tweets) before start
-	 * the search from the most recent tweets again.
-	 * The total amount of tweets searched backwards is (page * count)
+	 *
 	 */
-	@Positive
-	private int page = 3;
+	private Expression maxId;
+
+	/**
+	 *
+	 */
+	private Expression sinceId;
 
 	/**
 	 * Number of tweets to return per page (e.g. per single request), up to a max of 100.
 	 */
-	@Positive
-	@Max(100)
-	private int count = 100;
+	private Expression count = new SpelExpressionParser().parseExpression("'100'");
 
 	/**
 	 * Restricts searched tweets to the given language, given by an <a href="http://en.wikipedia.org/wiki/ISO_639-1">ISO 639-1 code</a>
 	 */
-	private String lang = null;
+	private Expression lang = null;
 
 	/**
 	 * If specified, returns tweets with since the given date. Date should be formatted as YYYY-MM-DD.
 	 */
-	@Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$")
-	private String since = null;
+	private Expression since = null;
 
 	/**
 	 * If specified, returns tweets by users located within a given radius (in Km) of the given latitude/longitude,
@@ -84,63 +83,51 @@ public class TwitterSearchSourceProperties {
 	@NotNull
 	private Query.ResultType resultType = Query.ResultType.mixed;
 
-	/**
-	 * Restart search from the most recent tweets on empty response.
-	 * Applied only after the first restart (e.g. when since_id != UNBOUNDED)
-	 */
-	private boolean restartFromMostRecentOnEmptyResponse = false;
-
-	/**
-	 * Fixed delay between two consecutive search requests.
-	 * The search API rate limits are 180 requests per
-	 */
-	public int pollInterval = 11000;
-
-	public int getPollInterval() {
-		return pollInterval;
-	}
-
-	public void setPollInterval(int pollInterval) {
-		this.pollInterval = pollInterval;
-	}
-
-	public String getQuery() {
+	public Expression getQuery() {
 		return query;
 	}
 
-	public void setQuery(String query) {
+	public void setQuery(Expression query) {
 		this.query = query;
 	}
 
-	public String getLang() {
+	public Expression getLang() {
 		return lang;
 	}
 
-	public void setLang(String lang) {
+	public void setLang(Expression lang) {
 		this.lang = lang;
 	}
 
-	public int getPage() {
-		return page;
+	public Expression getMaxId() {
+		return maxId;
 	}
 
-	public void setPage(int page) {
-		this.page = page;
+	public void setMaxId(Expression maxId) {
+		this.maxId = maxId;
 	}
 
-	public int getCount() {
+	public Expression getSinceId() {
+		return sinceId;
+	}
+
+	public void setSinceId(Expression sinceId) {
+		this.sinceId = sinceId;
+	}
+
+	public Expression getCount() {
 		return count;
 	}
 
-	public void setCount(int count) {
+	public void setCount(Expression count) {
 		this.count = count;
 	}
 
-	public String getSince() {
+	public Expression getSince() {
 		return since;
 	}
 
-	public void setSince(String since) {
+	public void setSince(Expression since) {
 		this.since = since;
 	}
 
@@ -156,57 +143,45 @@ public class TwitterSearchSourceProperties {
 		this.resultType = resultType;
 	}
 
-	public boolean isRestartFromMostRecentOnEmptyResponse() {
-		return restartFromMostRecentOnEmptyResponse;
-	}
-
-	public void setRestartFromMostRecentOnEmptyResponse(boolean restartFromMostRecentOnEmptyResponse) {
-		this.restartFromMostRecentOnEmptyResponse = restartFromMostRecentOnEmptyResponse;
-	}
-
 	public static class Geocode {
 
 		/**
 		 * User's latitude
 		 */
-		private double latitude = -1;
+		private Expression latitude;
 
 		/**
 		 * User's longitude
 		 */
-		private double longitude = -1;
+		private Expression longitude;
 
 		/**
 		 * Radius (in kilometers) around the (latitude, longitude) point
 		 */
-		private double radius = -1;
+		private Expression radius = new SpelExpressionParser().parseExpression("'10'");;
 
-		public double getLatitude() {
+		public Expression getLatitude() {
 			return latitude;
 		}
 
-		public void setLatitude(double latitude) {
+		public void setLatitude(Expression latitude) {
 			this.latitude = latitude;
 		}
 
-		public double getLongitude() {
+		public Expression getLongitude() {
 			return longitude;
 		}
 
-		public void setLongitude(double longitude) {
+		public void setLongitude(Expression longitude) {
 			this.longitude = longitude;
 		}
 
-		public double getRadius() {
+		public Expression getRadius() {
 			return radius;
 		}
 
-		public void setRadius(double radius) {
+		public void setRadius(Expression radius) {
 			this.radius = radius;
-		}
-
-		public boolean isValid() {
-			return this.radius > 0;
 		}
 	}
 }

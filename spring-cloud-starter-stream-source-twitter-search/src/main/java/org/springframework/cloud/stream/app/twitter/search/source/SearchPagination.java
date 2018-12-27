@@ -2,6 +2,7 @@ package org.springframework.cloud.stream.app.twitter.search.source;
 
 import java.util.List;
 
+import twitter4j.Paging;
 import twitter4j.Status;
 
 import org.springframework.util.Assert;

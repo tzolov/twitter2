@@ -44,8 +44,7 @@ public class TwitterGeoProcessorConfiguration {
 
 	@Bean
 	public IntegrationFlow geoQueryFlow(Processor processor, Function<Message<?>, GeoQuery> toGeoQuery,
-			Function<GeoQuery, List<Place>> placesFunction,
-			Function<List<Place>, String> toJson) {
+			Function<GeoQuery, List<Place>> placesFunction, Function<List<Place>, String> toJson) {
 
 		return IntegrationFlows
 				.from(processor.input())

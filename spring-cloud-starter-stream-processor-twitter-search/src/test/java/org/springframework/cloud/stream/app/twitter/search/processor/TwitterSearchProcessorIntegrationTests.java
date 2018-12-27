@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.stream.app.twitter.search.source;
+package org.springframework.cloud.stream.app.twitter.search.processor;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,6 +23,7 @@ import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,18 +39,18 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.stream.app.test.twitter.TwitterTestUtils;
 import org.springframework.cloud.stream.app.twitter.common.TwitterConnectionProperties;
-import org.springframework.cloud.stream.messaging.Source;
+import org.springframework.cloud.stream.messaging.Processor;
 import org.springframework.cloud.stream.test.binder.MessageCollector;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
+import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockserver.matchers.Times.exactly;
 import static org.mockserver.model.HttpRequest.request;
@@ -59,6 +60,7 @@ import static org.mockserver.verify.VerificationTimes.once;
 /**
  * @author Christian Tzolov
  */
+@SuppressWarnings("SpringJavaAutowiringInspection")
 @RunWith(SpringRunner.class)
 @SpringBootTest(
 		webEnvironment = SpringBootTest.WebEnvironment.NONE,
@@ -69,7 +71,7 @@ import static org.mockserver.verify.VerificationTimes.once;
 				"twitter.connection.accessTokenSecret=accessTokenSecret666"
 		})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public abstract class TwitterSearchSourceIntegrationTests {
+public abstract class TwitterSearchProcessorIntegrationTests {
 
 	private static final String MOCK_SERVER_IP = "127.0.0.1";
 
@@ -78,13 +80,11 @@ public abstract class TwitterSearchSourceIntegrationTests {
 	private static ClientAndServer mockServer;
 
 	private static MockServerClient mockClient;
-
 	private static HttpRequest searchVratsaRequest;
-
 	private static HttpRequest searchAmsterdamRequest;
 
 	@Autowired
-	protected Source channels;
+	protected Processor channels;
 
 	@Autowired
 	protected MessageCollector messageCollector;
@@ -98,15 +98,15 @@ public abstract class TwitterSearchSourceIntegrationTests {
 				.withMethod("GET")
 				.withPath("/search/tweets.json")
 				.withQueryStringParameter("q", "Vratsa")
-				.withQueryStringParameter("count", "3"));
+				.withQueryStringParameter("count", "100"));
 
 		searchAmsterdamRequest = setExpectation(request()
 				.withMethod("GET")
 				.withPath("/search/tweets.json")
 				.withQueryStringParameter("q", "Amsterdam")
-				.withQueryStringParameter("count", "3")
+				.withQueryStringParameter("count", "100")
 				.withQueryStringParameter("result_type", "popular")
-				.withQueryStringParameter("geocode", "52.1,4.8,10.0km")
+				.withQueryStringParameter("geocode", "52.1,4.8,5.0km")
 				.withQueryStringParameter("since", "2018-01-01")
 				.withQueryStringParameter("lang", "en"));
 	}
@@ -114,56 +114,6 @@ public abstract class TwitterSearchSourceIntegrationTests {
 	@AfterClass
 	public static void stopServer() {
 		mockServer.stop();
-	}
-
-	@TestPropertySource(properties = {
-			"twitter.search.query=Vratsa",
-			"twitter.search.count=3",
-			"twitter.search.page=3"
-	})
-	public static class TwitterSearchTests extends TwitterSearchSourceIntegrationTests {
-
-		@Test
-		public void testOne() throws InterruptedException, IOException {
-
-			Message<?> received = messageCollector.forChannel(this.channels.output()).poll(120, TimeUnit.SECONDS);
-
-			mockClient.verify(searchVratsaRequest, once());
-
-			assertNotNull(received);
-			String payload = received.getPayload().toString();
-			List tweets = new ObjectMapper().readValue(payload, List.class);
-			assertThat(tweets.size(), is(3));
-		}
-	}
-
-	@TestPropertySource(properties = {
-			"twitter.search.query=Amsterdam",
-			"twitter.search.count=3",
-			"twitter.search.page=3",
-			"twitter.search.lang=en",
-			"twitter.search.geocode.latitude=52.1",
-			"twitter.search.geocode.longitude=4.8",
-			"twitter.search.geocode.radius=10",
-			"twitter.search.since=2018-01-01",
-			"twitter.search.resultType=popular",
-			"twitter.search.pollInterval=10000"
-	})
-	public static class TwitterSearchAllParamsTests extends TwitterSearchSourceIntegrationTests {
-
-		@Test
-		public void testOne() throws InterruptedException, IOException {
-
-			Message<?> received = messageCollector.forChannel(this.channels.output()).poll(30, TimeUnit.SECONDS);
-
-			mockClient.verify(searchAmsterdamRequest, once());
-
-			assertNotNull(received);
-			String payload = received.getPayload().toString();
-			List tweets = new ObjectMapper().readValue(payload, List.class);
-			assertThat(tweets.size(), is(3));
-
-		}
 	}
 
 	public static HttpRequest setExpectation(HttpRequest request) {
@@ -180,10 +130,64 @@ public abstract class TwitterSearchSourceIntegrationTests {
 		return request;
 	}
 
+	@TestPropertySource(properties = {
+			"debug=true",
+			"logging.level.*=DEBUG",
+	})
+	public static class TwitterSearchPayloadTests extends TwitterSearchProcessorIntegrationTests {
+
+		@Test
+		public void testOne() throws IOException {
+
+			Object payload = "Vratsa";
+
+			channels.input().send(MessageBuilder.withPayload(payload).build());
+
+			mockClient.verify(searchVratsaRequest, once());
+
+			Message<?> received = messageCollector.forChannel(channels.output()).poll();
+
+			Assert.assertNotNull(received);
+			String outPayload = received.getPayload().toString();
+			List tweets = new ObjectMapper().readValue(outPayload, List.class);
+			assertThat(tweets.size(), is(3));
+		}
+	}
+
+	@TestPropertySource(properties = {
+			"twitter.search.query='Amsterdam'",
+			"twitter.search.count='100'",
+			"twitter.search.lang='en'",
+			"twitter.search.geocode.latitude='52.1'",
+			"twitter.search.geocode.longitude='4.8'",
+			"twitter.search.geocode.radius='5'",
+			"twitter.search.since='2018-01-01'",
+			"twitter.search.resultType=popular"
+	})
+	public static class TwitterSearchAmsterdamTests extends TwitterSearchProcessorIntegrationTests {
+
+		@Test
+		public void testOne() throws IOException {
+
+			Object payload = "Something";
+
+			channels.input().send(MessageBuilder.withPayload(payload).build());
+
+			mockClient.verify(searchAmsterdamRequest, once());
+
+			Message<?> received = messageCollector.forChannel(channels.output()).poll();
+
+			Assert.assertNotNull(received);
+			String outPayload = received.getPayload().toString();
+			List tweets = new ObjectMapper().readValue(outPayload, List.class);
+			assertThat(tweets.size(), is(3));
+		}
+	}
+
 	@SpringBootConfiguration
 	@EnableAutoConfiguration
-	@Import(TwitterSearchSourceConfiguration.class)
-	public static class TestTwitterSearchSourceApplication {
+	@Import(TwitterSearchProcessorConfiguration.class)
+	public static class TestTwitterSearchProcessorApplication {
 
 		@Bean
 		@Primary
@@ -197,5 +201,7 @@ public abstract class TwitterSearchSourceIntegrationTests {
 
 			return mockedConfiguration.apply(properties).build();
 		}
+
 	}
+
 }

@@ -16,10 +16,14 @@
 
 package org.springframework.cloud.stream.app.twitter.common;
 
+import java.util.List;
 import java.util.function.Function;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
 import twitter4j.TwitterStream;
@@ -33,6 +37,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.support.MutableMessage;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.util.MimeTypeUtils;
 
 /**
  *
@@ -85,6 +91,24 @@ public class TwitterConnectionConfiguration {
 			}
 
 			return message;
+		};
+	}
+
+	@Bean
+	public Function<List<Status>, Message<byte[]>> json(ObjectMapper mapper) {
+		return tweets -> {
+			try {
+				String json = mapper.writeValueAsString(tweets);
+
+				return MessageBuilder
+						.withPayload(json.getBytes())
+						.setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE)
+						.build();
+			}
+			catch (JsonProcessingException e) {
+				logger.error("Status to JSON conversion error!", e);
+			}
+			return null;
 		};
 	}
 }

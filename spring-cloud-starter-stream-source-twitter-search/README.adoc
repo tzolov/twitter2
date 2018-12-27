@@ -7,6 +7,8 @@ Returns a collection of relevant Tweets matching a specified query.
 
 Note: Twitter's search service and, by extension, the Search API is not meant to be an exhaustive source of Tweets. Not all Tweets will be indexed or made available via the search interface.
 
+TIP: Rate Limit - 180 requests per 30 min. window (e.g. ~6 r/m, ~ 1 req / 10 sec.)
+
 
 == Options
 
@@ -17,6 +19,7 @@ $$twitter.search.geocode.longitude$$:: $$User's longitude$$ *($$Double$$, defaul
 $$twitter.search.geocode.radius$$:: $$Radius (in kilometers) around the (latitude, longitude) point$$ *($$Double$$, default: `$$-1$$`)*
 $$twitter.search.lang$$:: $$Restricts searched tweets to the given language, given by an <a href="http://en.wikipedia.org/wiki/ISO_639-1">ISO 639-1 code</a>$$ *($$String$$, default: `$$<none>$$`)*
 $$twitter.search.page$$:: $$Number of pages (e.g. requests) to search backwards (from most recent to the oldest tweets) before start the search from the most recent tweets again. The total amount of tweets searched backwards is (page * count)$$ *($$Integer$$, default: `$$3$$`)*
+$$twitter.search.poll-interval$$:: $$Fixed delay between two consecutive search requests. The search API rate limits are 180 requests per$$ *($$Integer$$, default: `$$11000$$`)*
 $$twitter.search.query$$:: $$Search tweets by search query string$$ *($$String$$, default: `$$<none>$$`)*
 $$twitter.search.restart-from-most-recent-on-empty-response$$:: $$Restart search from the most recent tweets on empty response. Applied only after the first restart (e.g. when since_id != UNBOUNDED)$$ *($$Boolean$$, default: `$$false$$`)*
 $$twitter.search.result-type$$:: $$Specifies what type of search results you would prefer to receive.  The current default is "mixed." Valid values include:   mixed : Include both popular and real time results in the response.   recent : return only the most recent results in the response   popular : return only the most popular results in the response$$ *($$ResultType$$, default: `$$<none>$$`, possible values: `popular`,`mixed`,`recent`)*

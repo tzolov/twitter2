@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.app.twitter.common.TwitterConnectionConfiguration;
+import org.springframework.cloud.stream.app.twitter.common.TwitterConnectionProperties;
 import org.springframework.cloud.stream.messaging.Source;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -66,10 +67,10 @@ public class TwitterSearchSourceConfiguration {
 	private Twitter twitter;
 
 	@Autowired
-	private ObjectMapper objectMapper;
+	private SearchPagination searchPage;
 
 	@Autowired
-	private SearchPagination searchPage;
+	private Function<List<Status>, Message<byte[]>> json;
 
 	@Bean
 	public SearchPagination searchPage() {
@@ -78,7 +79,8 @@ public class TwitterSearchSourceConfiguration {
 				this.searchProperties.isRestartFromMostRecentOnEmptyResponse());
 	}
 
-	@InboundChannelAdapter(value = Source.OUTPUT, poller = @Poller(fixedDelay = "10000", maxMessagesPerPoll = "1"))
+	@InboundChannelAdapter(value = Source.OUTPUT, poller = @Poller(fixedDelay = "${ twitter.search.poll-interval:11000}",
+			maxMessagesPerPoll = "1"))
 	public Message<byte[]> myMessageSource() {
 		try {
 			Query query = toQuery(this.searchProperties, this.searchPage);
@@ -91,17 +93,7 @@ public class TwitterSearchSourceConfiguration {
 
 			this.searchPage.update(tweets);
 
-			try {
-				String json = objectMapper.writeValueAsString(tweets);
-
-				return MessageBuilder
-						.withPayload(json.getBytes())
-						.setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE)
-						.build();
-			}
-			catch (JsonProcessingException e) {
-				logger.error("Status to JSON conversion error!", e);
-			}
+			return this.json.apply(tweets);
 		}
 		catch (TwitterException e) {
 			logger.error("Twitter error", e);
@@ -128,14 +120,14 @@ public class TwitterSearchSourceConfiguration {
 		if (searchProperties.getGeocode().isValid()) {
 			query.setGeoCode(
 					new GeoLocation(
-							this.searchProperties.getGeocode().getLatitude(),
-							this.searchProperties.getGeocode().getLongitude()),
-					this.searchProperties.getGeocode().getRadius(),
+							searchProperties.getGeocode().getLatitude(),
+							searchProperties.getGeocode().getLongitude()),
+					searchProperties.getGeocode().getRadius(),
 					Query.KILOMETERS);
 		}
 
 		if (searchProperties.getResultType() != Query.ResultType.mixed) {
-			query.setResultType(this.searchProperties.getResultType());
+			query.setResultType(searchProperties.getResultType());
 		}
 
 		if (pagination.getSinceId() > 0) {

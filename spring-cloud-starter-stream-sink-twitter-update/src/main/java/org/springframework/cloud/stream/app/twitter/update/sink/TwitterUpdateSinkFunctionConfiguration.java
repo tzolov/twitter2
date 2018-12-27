@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.stream.app.twitter.update.sink;
 
+import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -27,9 +28,12 @@ import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.messaging.Message;
 import org.springframework.util.Assert;
 
@@ -42,6 +46,13 @@ import org.springframework.util.Assert;
 public class TwitterUpdateSinkFunctionConfiguration {
 
 	private static final Log logger = LogFactory.getLog(TwitterUpdateSinkFunctionConfiguration.class);
+
+	@Autowired
+	public void setInfoProperties(ConfigurableEnvironment env) {
+		Properties props = new Properties();
+		props.put("spring.cloud.stream.function.definition", "toText|upper|sink");
+		env.getPropertySources().addFirst(new PropertiesPropertySource("function-dsl-props", props));
+	}
 
 	@Bean
 	public Consumer<StatusUpdate> updateStatus(Twitter twitter) {

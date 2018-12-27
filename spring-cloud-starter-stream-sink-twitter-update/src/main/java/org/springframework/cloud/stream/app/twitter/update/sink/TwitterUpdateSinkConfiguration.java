@@ -16,14 +16,25 @@
 
 package org.springframework.cloud.stream.app.twitter.update.sink;
 
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import twitter4j.StatusUpdate;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.app.twitter.common.OnMissingStreamFunctionDefinitionCondition;
 import org.springframework.cloud.stream.app.twitter.common.TwitterConnectionConfiguration;
 import org.springframework.cloud.stream.messaging.Sink;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Import;
+import org.springframework.integration.dsl.IntegrationFlow;
+import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.messaging.Message;
 
 /**
  *
@@ -31,8 +42,24 @@ import org.springframework.context.annotation.Import;
  */
 @EnableBinding(Sink.class)
 @EnableConfigurationProperties({ TwitterUpdateSinkProperties.class })
-@Import({TwitterConnectionConfiguration.class, TwitterUpdateSinkFunctionConfiguration.class})
+@Import({ TwitterConnectionConfiguration.class, TwitterUpdateSinkFunctionConfiguration.class })
 public class TwitterUpdateSinkConfiguration {
 
 	private static final Log logger = LogFactory.getLog(TwitterUpdateSinkConfiguration.class);
+
+	// Default function DSL, that is equivalent to: normalizeStringPayload|toStatusUpdateQuery|updateStatus
+	// Set the spring.cloud.stream.function.definition to override the default composition.
+	@Bean
+	@ConditionalOnMissingBean
+	@Conditional(OnMissingStreamFunctionDefinitionCondition.class)
+	public IntegrationFlow statusUpdateFlow(Sink sink, Function<Message<?>, Message<?>> normalizeStringPayload,
+			Function<Message<?>, StatusUpdate> statusUpdateQuery, Consumer<StatusUpdate> updateStatus) {
+
+		return IntegrationFlows
+				.from(sink.input())
+				.transform(Message.class, normalizeStringPayload.andThen(statusUpdateQuery)::apply)
+				.handle(updateStatus)
+				.get();
+	}
+
 }
