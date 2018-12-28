@@ -1,4 +1,4 @@
-package org.springframework.cloud.stream.app.twitter.friendships.source;
+package org.springframework.cloud.stream.app.twitter.common;
 
 /**
  * @author Christian Tzolov

@@ -31,6 +31,7 @@ import twitter4j.User;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.stream.app.twitter.common.Cursor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.metadata.MetadataStore;
 import org.springframework.integration.metadata.SimpleMetadataStore;

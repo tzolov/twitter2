@@ -17,6 +17,7 @@
 package org.springframework.cloud.stream.app.twitter.message.source;
 
 import javax.validation.constraints.Max;
+import javax.validation.constraints.Positive;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
@@ -35,11 +36,25 @@ public class TwitterMessageSourceProperties {
 	@Max(50)
 	private int count = 20;
 
+	/**
+	 * API request poll interval in milliseconds. Must be aligned with used APIs rate limits
+	 */
+	@Positive
+	private int pollInterval = 121000;
+
 	public int getCount() {
 		return count;
 	}
 
 	public void setCount(int count) {
 		this.count = count;
+	}
+
+	public int getPollInterval() {
+		return pollInterval;
+	}
+
+	public void setPollInterval(int pollInterval) {
+		this.pollInterval = pollInterval;
 	}
 }

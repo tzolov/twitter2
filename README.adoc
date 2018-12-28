@@ -16,31 +16,32 @@ include::spring-cloud-starter-stream-common-twitter/README.adoc[]
 
 # Tweets
 
-### twitter-update sink
-Updates the authenticating user's current text (e.g Tweeting).
+### twitter-stream source
+Real-time Tweet Streaming APIs such as the https://developer.twitter.com/en/docs/tweets/filter-realtime/api-reference/post-statuses-filter.html[Filter] and https://developer.twitter.com/en/docs/tweets/sample-realtime/overview/GET_statuse_sample[Sample] APIs.
 
-include::spring-cloud-starter-stream-sink-twitter-update/README.adoc[]
+include::spring-cloud-starter-stream-source-twitter-stream/README.adoc[]
 
 ---
 
 ### twitter-search source
-Returns a collection of relevant Tweets matching a specified query.
+Source application based on the https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets[Standard Search API] that returns a collection of relevant Tweets matching a specified query.
 
 include::spring-cloud-starter-stream-source-twitter-search/README.adoc[]
 
 ---
 
 ### twitter-search processor
+Processor application based on the https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets[Standard Search API] that returns a collection of relevant Tweets matching a specified query.
 With the help of property SpEL expression, converts the inbound message into a twitter search query, runs the query and sends the result tweets into the output channel as JSON message.
 
 include::spring-cloud-starter-stream-processor-twitter-search/README.adoc[]
 
 ---
 
-### twitter-stream source
-Real-time Tweet Streaming APIs such as the https://developer.twitter.com/en/docs/tweets/filter-realtime/api-reference/post-statuses-filter.html[Filter] and https://developer.twitter.com/en/docs/tweets/sample-realtime/overview/GET_statuse_sample[Sample] APIs.
+### twitter-update sink
+https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/post-statuses-update[Twitter Update API] for updating the authenticating user's current text (e.g Tweeting).
 
-include::spring-cloud-starter-stream-source-twitter-stream/README.adoc[]
+include::spring-cloud-starter-stream-sink-twitter-update/README.adoc[]
 
 ---
 
@@ -61,20 +62,13 @@ include::spring-cloud-starter-stream-sink-twitter-message/README.adoc[]
 
 ---
 
-# GEO
+# Geo
 
 ### twitter-geo processor
 Leverages the https://developer.twitter.com/en/docs/geo/places-near-location/overview[Geo API] to retrieves Twitter place information based on query parameters such as (`latitude`, `longitude`) pair, an `IP` address, or a place `name`.
 SpEL expressions are used to compute the request parameters from the input message.
 
 include::spring-cloud-starter-stream-processor-twitter-geo/README.adoc[]
-
----
-
-### twitter-timeline source
-*Description*: TODO
-
-include::spring-cloud-starter-stream-source-twitter-timeline/README.adoc[]
 
 ---
 
@@ -105,3 +99,10 @@ include::spring-cloud-starter-stream-processor-twitter-users/README.adoc[]
 
 ---
 
+
+### twitter-timeline source
+*Description*: TODO
+
+include::spring-cloud-starter-stream-source-twitter-timeline/README.adoc[]
+
+---
