@@ -70,3 +70,29 @@ include::spring-cloud-starter-stream-source-twitter-timeline/README.adoc[]
 
 ---
 
+# Accounts and users
+
+### twitter-friendships sink
+Allows creating `follow`, `unfollow` and `update` relationships with specified `userId` or `screenName`.
+The `twitter.friendships.sink.type` property allows to select the desired friendship operation.
+
+include::spring-cloud-starter-stream-sink-twitter-friendships/README.adoc[]
+
+---
+
+### twitter-friendships source
+
+Returns a cursored collection of user objects either for the https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-followers-list[users following the specified user] (`followers`) or for https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-friends-list[every user the specified user is following] (`friends`).
+
+include::spring-cloud-starter-stream-source-twitter-friendships/README.adoc[]
+
+---
+
+### twitter-users processor
+Retrieves users either by list of use ids and/or screen-names (https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-lookup[Users Lookup API]) or by text search query (https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-search[Users Search API]).
+
+
+include::spring-cloud-starter-stream-processor-twitter-users/README.adoc[]
+
+---
+

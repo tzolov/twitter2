@@ -60,7 +60,6 @@ import static org.mockserver.verify.VerificationTimes.once;
 /**
  * @author Christian Tzolov
  */
-@SuppressWarnings("SpringJavaAutowiringInspection")
 @RunWith(SpringRunner.class)
 @SpringBootTest(
 		webEnvironment = SpringBootTest.WebEnvironment.NONE,

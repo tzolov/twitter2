@@ -16,14 +16,12 @@
 
 package org.springframework.cloud.stream.app.twitter.common;
 
-import java.util.List;
 import java.util.function.Function;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
 import twitter4j.TwitterStream;
@@ -95,10 +93,10 @@ public class TwitterConnectionConfiguration {
 	}
 
 	@Bean
-	public Function<List<Status>, Message<byte[]>> json(ObjectMapper mapper) {
-		return tweets -> {
+	public Function<Object, Message<byte[]>> json(ObjectMapper mapper) {
+		return objects -> {
 			try {
-				String json = mapper.writeValueAsString(tweets);
+				String json = mapper.writeValueAsString(objects);
 
 				return MessageBuilder
 						.withPayload(json.getBytes())

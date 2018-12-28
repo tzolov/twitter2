@@ -19,8 +19,6 @@ package org.springframework.cloud.stream.app.twitter.search.source;
 import java.util.List;
 import java.util.function.Function;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import twitter4j.GeoLocation;
@@ -34,17 +32,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.app.twitter.common.TwitterConnectionConfiguration;
-import org.springframework.cloud.stream.app.twitter.common.TwitterConnectionProperties;
 import org.springframework.cloud.stream.messaging.Source;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.integration.annotation.InboundChannelAdapter;
 import org.springframework.integration.annotation.Poller;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageHeaders;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.Assert;
-import org.springframework.util.MimeTypeUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -70,7 +64,7 @@ public class TwitterSearchSourceConfiguration {
 	private SearchPagination searchPage;
 
 	@Autowired
-	private Function<List<Status>, Message<byte[]>> json;
+	private Function<Object, Message<byte[]>> json;
 
 	@Bean
 	public SearchPagination searchPage() {

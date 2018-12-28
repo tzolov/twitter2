@@ -27,6 +27,10 @@
 		<module>spring-cloud-starter-stream-source-twitter-message</module>
 		<module>spring-cloud-starter-stream-processor-twitter-geo</module>
 		<module>spring-cloud-starter-stream-processor-twitter-search</module>
+
+		<module>spring-cloud-starter-stream-sink-twitter-friendships</module>
+		<module>spring-cloud-starter-stream-source-twitter-friendships</module>
+		<module>spring-cloud-starter-stream-processor-twitter-users</module>
 	</modules>
 
 	<dependencyManagement>
