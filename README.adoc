@@ -14,6 +14,8 @@ include::spring-cloud-starter-stream-common-twitter/README.adoc[]
 
 ---
 
+# Tweets
+
 ### twitter-update sink
 Updates the authenticating user's current text (e.g Tweeting).
 
@@ -42,6 +44,8 @@ include::spring-cloud-starter-stream-source-twitter-stream/README.adoc[]
 
 ---
 
+# Direct Message
+
 ### twitter-message source
 *Description*: TODO
 
@@ -51,13 +55,17 @@ include::spring-cloud-starter-stream-source-twitter-message/README.adoc[]
 
 ### twitter-message sink
 Send Direct Messages to a specified user from the authenticating user.
+SpEL expressions are used to compute the request parameters from the input message.
 
 include::spring-cloud-starter-stream-sink-twitter-message/README.adoc[]
 
 ---
 
+# GEO
+
 ### twitter-geo processor
 Leverages the https://developer.twitter.com/en/docs/geo/places-near-location/overview[Geo API] to retrieves Twitter place information based on query parameters such as (`latitude`, `longitude`) pair, an `IP` address, or a place `name`.
+SpEL expressions are used to compute the request parameters from the input message.
 
 include::spring-cloud-starter-stream-processor-twitter-geo/README.adoc[]
 
@@ -75,6 +83,7 @@ include::spring-cloud-starter-stream-source-twitter-timeline/README.adoc[]
 ### twitter-friendships sink
 Allows creating `follow`, `unfollow` and `update` relationships with specified `userId` or `screenName`.
 The `twitter.friendships.sink.type` property allows to select the desired friendship operation.
+SpEL expressions are used to compute the request parameters from the input message.
 
 include::spring-cloud-starter-stream-sink-twitter-friendships/README.adoc[]
 
@@ -90,7 +99,7 @@ include::spring-cloud-starter-stream-source-twitter-friendships/README.adoc[]
 
 ### twitter-users processor
 Retrieves users either by list of use ids and/or screen-names (https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-lookup[Users Lookup API]) or by text search query (https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-search[Users Search API]).
-
+Uses SpEL expressions to compute the query parameters from the input message.
 
 include::spring-cloud-starter-stream-processor-twitter-users/README.adoc[]
 

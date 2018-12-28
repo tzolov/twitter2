@@ -9,6 +9,8 @@ Each message received resets the 24 hour window and the 5 allotted messages.
 Sending a 6th message within a 24 hour window or sending a message outside of a 24 hour window will count towards rate-limiting.
 This behavior only applies when using the POST direct_messages/events/new endpoint.
 
+SpEL expressions are used to compute the request parameters from the input message.
+
 == Options
 TIP: Use single quotes (`'`) to wrap the literal values of the `SpEL` expression properties.
 For example to set a fixed message text use `text='Fixed Text'`.

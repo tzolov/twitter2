@@ -2,7 +2,8 @@
 = Twitter Users Processor
 
 Retrieves users either by list of use ids and/or screen-names (https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-lookup[Users Lookup API]) or by text search query (https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-search[Users Search API]).
-The SpEL expressions are used to compute the query parameters from the input message. Use the single quoted literals to set static values (e.g. user-id: '6666, 9999, 10000').
+Uses SpEL expressions to compute the query parameters from the input message.
+Use the single quoted literals to set static values (e.g. user-id: '6666, 9999, 10000').
 
 Use `twitter.users.type` property allow to select the query approaches.
 

@@ -10,7 +10,9 @@ Changes will be eventually consistent.
 * https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/post-friendships-update[Friendships Update API] - Enable or disable Retweets and device notifications from the specified user.
 * https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/post-friendships-destroy[Friendships Destroy API] - Allows the authenticating user to unfollow the user specified in the ID parameter.
 
+SpEL expressions are used to compute the request parameters from the input message.
 Every operation type has its own parameters.
+
 
 == Options
 
