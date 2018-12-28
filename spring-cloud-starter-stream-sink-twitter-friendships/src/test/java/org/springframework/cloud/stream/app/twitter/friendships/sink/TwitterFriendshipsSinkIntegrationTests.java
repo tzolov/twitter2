@@ -59,11 +59,6 @@ import static org.mockserver.verify.VerificationTimes.once;
 				"twitter.connection.consumerSecret=consumerSecret666",
 				"twitter.connection.accessToken=accessToken666",
 				"twitter.connection.accessTokenSecret=accessTokenSecret666"
-
-				//"twitter.connection.consumerKey=UK7rAyFvEayBIvcL52p07x0KT",
-				//"twitter.connection.consumerSecret=QNYo29JRWgWhNoq0m6i0Bxt0DzeSi46eedZuFqEROnZdG8nlRs",
-				//"twitter.connection.accessToken=1073883577107038208-TG4AUFm2EgpzRFDdK0PeWsBKplvoqT",
-				//"twitter.connection.accessTokenSecret=Xnh2yjoLvSTUl4dbDXzRDDpWo5KT7QsK3jYb1Y1RXWakq"
 		})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class TwitterFriendshipsSinkIntegrationTests {
