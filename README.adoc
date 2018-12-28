@@ -55,7 +55,7 @@ include::spring-cloud-starter-stream-source-twitter-message/README.adoc[]
 ---
 
 ### twitter-message sink
-Send Direct Messages to a specified user from the authenticating user.
+Based on https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/new-event[Direct Send Messages API] sink for sending direct messages to a specified user from the authenticating user.
 SpEL expressions are used to compute the request parameters from the input message.
 
 include::spring-cloud-starter-stream-sink-twitter-message/README.adoc[]
