@@ -101,17 +101,6 @@ public class TwitterMessageSourceFunctionConfiguration {
 	}
 
 	@Bean
-	public Function<List<DirectMessage>, List<String>> toRawJsonMessages() {
-		return messages -> {
-			List<String> rawJsonList = new ArrayList<>();
-			for (DirectMessage message : messages) {
-				rawJsonList.add(TwitterObjectFactory.getRawJSON(message));
-			}
-			return rawJsonList;
-		};
-	}
-
-	@Bean
 	public Function<List<DirectMessage>, List<DirectMessage>> messageDeduplicate(MetadataStore metadataStore) {
 		return messages -> {
 			List<DirectMessage> uniqueMessages = new ArrayList<>();

@@ -47,7 +47,7 @@ public class TwitterMessageSourceConfiguration {
 	private Function<Object, Message<byte[]>> json;
 
 	@Autowired
-	private Function<List<DirectMessage>, List<String>> toRawJsonMessages;
+	private Function<List<?>, List<String>> toRawJson;
 
 	@Autowired
 	private Supplier<List<DirectMessage>> directMessagesSupplier;
@@ -58,6 +58,6 @@ public class TwitterMessageSourceConfiguration {
 	@InboundChannelAdapter(value = Source.OUTPUT,
 			poller = @Poller(fixedDelay = "${twitter.message.source.poll-interval:121000}", maxMessagesPerPoll = "1"))
 	public Message<byte[]> userRetrieval() {
-		return this.messageDeduplicate.andThen(toRawJsonMessages).andThen(json).apply(directMessagesSupplier.get());
+		return this.messageDeduplicate.andThen(toRawJson).andThen(json).apply(directMessagesSupplier.get());
 	}
 }

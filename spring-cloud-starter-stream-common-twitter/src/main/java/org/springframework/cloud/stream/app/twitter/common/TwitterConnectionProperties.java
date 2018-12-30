@@ -16,8 +16,6 @@
 
 package org.springframework.cloud.stream.app.twitter.common;
 
-import java.time.Duration;
-
 import javax.validation.constraints.NotEmpty;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -56,14 +54,16 @@ public class TwitterConnectionProperties {
 	private String accessTokenSecret;
 
 	/**
-	 * Twitter APIs poll interval. Applicable for the non streaming Twitter APIs
-	 */
-	private Duration pollInterval = Duration.ofMinutes(1);
-
-	/**
 	 * Enables Twitter4J debug mode.
 	 */
 	private boolean debugEnabled = false;
+
+	/**
+	 * Enable caching the original (raw) JSON objects as returned by the Twitter APIs.
+	 * When set to False the result will use the Twitter4J's json representations.
+	 * When set to True the result will use the original Twitter APISs json representations.
+	 */
+	private boolean rawJson = true;
 
 	public String getConsumerKey() {
 		return consumerKey;
@@ -97,19 +97,19 @@ public class TwitterConnectionProperties {
 		this.accessTokenSecret = accessTokenSecret;
 	}
 
-	public Duration getPollInterval() {
-		return pollInterval;
-	}
-
-	public void setPollInterval(Duration pollInterval) {
-		this.pollInterval = pollInterval;
-	}
-
 	public boolean isDebugEnabled() {
 		return debugEnabled;
 	}
 
 	public void setDebugEnabled(boolean debugEnabled) {
 		this.debugEnabled = debugEnabled;
+	}
+
+	public boolean isRawJson() {
+		return this.rawJson;
+	}
+
+	public void setRawJson(boolean rawJson) {
+		this.rawJson = rawJson;
 	}
 }

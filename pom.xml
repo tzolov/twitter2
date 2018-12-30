@@ -31,6 +31,10 @@
 		<module>spring-cloud-starter-stream-sink-twitter-friendships</module>
 		<module>spring-cloud-starter-stream-source-twitter-friendships</module>
 		<module>spring-cloud-starter-stream-processor-twitter-users</module>
+
+		<module>spring-cloud-starter-stream-processor-twitter-trend</module>
+		<module>spring-cloud-starter-stream-processor-twitter-trend-location</module>
+
 	</modules>
 
 	<dependencyManagement>

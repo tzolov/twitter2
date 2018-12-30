@@ -99,6 +99,23 @@ include::spring-cloud-starter-stream-processor-twitter-users/README.adoc[]
 
 ---
 
+# Trends
+
+### twitter-trend processor
+Processor based on https://developer.twitter.com/en/docs/trends/trends-for-location/api-reference/get-trends-place[Trends API].
+Returns the https://help.twitter.com/en/using-twitter/twitter-trending-faqs[trending topics] near a specific latitude, longitude location.
+
+include::spring-cloud-starter-stream-processor-twitter-trend/README.adoc[]
+
+---
+
+### twitter-trend-location processor
+Retrieve a full or nearby locations list of trending topics by location based on the https://developer.twitter.com/en/docs/trends/locations-with-trending-topics/api-reference/get-trends-available[Trends Available API] or the https://developer.twitter.com/en/docs/trends/locations-with-trending-topics/api-reference/get-trends-closest[Trends Closest API].
+
+include::spring-cloud-starter-stream-processor-twitter-trend-location/README.adoc[]
+
+---
+
 # Timeline (WIP)
 
 ### twitter-timeline source

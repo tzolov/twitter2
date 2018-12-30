@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.stream.app.twitter.common;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
+import twitter4j.TwitterObjectFactory;
 import twitter4j.TwitterStream;
 import twitter4j.TwitterStreamFactory;
 import twitter4j.conf.ConfigurationBuilder;
@@ -67,7 +70,7 @@ public class TwitterConnectionConfiguration {
 	@Bean
 	public Function<TwitterConnectionProperties, ConfigurationBuilder> toConfigurationBuilder() {
 		return properties -> new ConfigurationBuilder()
-				.setJSONStoreEnabled(true)
+				.setJSONStoreEnabled(properties.isRawJson())
 				.setDebugEnabled(properties.isDebugEnabled())
 				.setOAuthConsumerKey(properties.getConsumerKey())
 				.setOAuthConsumerSecret(properties.getConsumerSecret())
@@ -108,5 +111,37 @@ public class TwitterConnectionConfiguration {
 			}
 			return null;
 		};
+	}
+
+	/**
+	 *  Retrieves the raw JSON form of the provided object.
+	 *
+	 *  Note that raw JSON forms can be retrieved only from the same thread invoked the last method
+	 *  call and will become inaccessible once another method call.
+	 *
+	 * @return Function that can retrieve the raw JSON object from the objects returned by the Twitter4J's APIs.
+	 */
+	@Bean
+	public Function<Object, Object> rawJsonExtractor() {
+		return response -> {
+			if (response instanceof List) {
+				List responses = (List) response;
+				List<String> rawJsonList = new ArrayList<>();
+				for (Object object : responses) {
+					rawJsonList.add(TwitterObjectFactory.getRawJSON(object));
+				}
+				return rawJsonList;
+			}
+			else {
+				return TwitterObjectFactory.getRawJSON(response);
+			}
+
+		};
+	}
+
+	@Bean
+	public Function<Object, Message<byte[]>> managedJson(TwitterConnectionProperties properties,
+			Function<Object, Object> rawJsonExtractor, Function<Object, Message<byte[]>> json) {
+		return list -> (properties.isRawJson()) ? rawJsonExtractor.andThen(json).apply(list) : json.apply(list);
 	}
 }
