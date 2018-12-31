@@ -16,18 +16,37 @@
 
 package org.springframework.cloud.stream.app.twitter.message.sink;
 
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.app.twitter.common.OnMissingStreamFunctionDefinitionCondition;
 import org.springframework.cloud.stream.app.twitter.common.TwitterConnectionConfiguration;
 import org.springframework.cloud.stream.messaging.Sink;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Import;
+import org.springframework.integration.annotation.ServiceActivator;
+import org.springframework.messaging.Message;
 
 /**
  *
  * @author Christian Tzolov
  */
 @EnableBinding(Sink.class)
-@EnableConfigurationProperties({ TwitterMessageSinkProperties.class })
 @Import({ TwitterMessageSinkFunctionConfiguration.class, TwitterConnectionConfiguration.class })
 public class TwitterMessageSinkConfiguration {
+
+	@Autowired
+	private Consumer<Message<?>> sendDirectMessage;
+
+	@Autowired
+	private Function<Message<?>, Message<?>> normalizeStringPayload;
+
+	@ServiceActivator(inputChannel = Sink.INPUT)
+	@Conditional(OnMissingStreamFunctionDefinitionCondition.class)
+	public void handle(Message<?> message) {
+		sendDirectMessage.accept(normalizeStringPayload.apply(message));
+	}
+
 }

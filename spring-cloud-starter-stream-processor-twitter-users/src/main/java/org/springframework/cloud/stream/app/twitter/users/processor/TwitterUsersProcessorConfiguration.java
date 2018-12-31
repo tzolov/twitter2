@@ -21,14 +21,8 @@ import java.util.function.Function;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import twitter4j.ResponseList;
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
 import twitter4j.User;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.app.twitter.common.OnMissingStreamFunctionDefinitionCondition;
 import org.springframework.cloud.stream.app.twitter.common.TwitterConnectionConfiguration;
@@ -47,68 +41,21 @@ import org.springframework.messaging.Message;
  */
 @Configuration
 @EnableBinding(Processor.class)
-@EnableConfigurationProperties({ TwitterUsersProcessorProperties.class })
-@Import(TwitterConnectionConfiguration.class)
+@Import({TwitterConnectionConfiguration.class, TwitterUsersProcessorFunctionConfiguration.class})
 public class TwitterUsersProcessorConfiguration {
 
 	private static final Log logger = LogFactory.getLog(TwitterUsersProcessorConfiguration.class);
-
-	@Autowired
-	private TwitterUsersProcessorProperties properties;
 
 	// Use the spring.cloud.stream.function.definition to override the default function composition.
 	@Bean
 	@Conditional(OnMissingStreamFunctionDefinitionCondition.class)
 	public IntegrationFlow defaultProcessorFlow(Processor processor,
-			Function<Message<?>, List<User>> querySearch, Function<Object, Message<byte[]>> json) {
+			Function<Message<?>, List<User>> queryUsers, Function<Object, Message<byte[]>> managedJson) {
 
 		return IntegrationFlows
 				.from(processor.input())
-				.transform(Message.class, querySearch.andThen(json)::apply)
+				.transform(Message.class, queryUsers.andThen(managedJson)::apply)
 				.channel(processor.output())
 				.get();
 	}
-
-	@Bean
-	@ConditionalOnProperty(name = "twitter.users.type", havingValue = "search")
-	public Function<Message<?>, List<User>> userSearch(Twitter twitter,
-			TwitterUsersProcessorProperties.Search search) {
-
-		return message -> {
-			String query = search.getQuery().getValue(message, String.class);
-			try {
-				ResponseList<User> users = twitter.searchUsers(query, search.getPage());
-				return users;
-			}
-			catch (TwitterException e) {
-				e.printStackTrace();
-			}
-			return null;
-		};
-	}
-
-	@Bean
-	@ConditionalOnProperty(name = "twitter.users.type", havingValue = "lookup")
-	public Function<Message<?>, List<User>> userLookup(Twitter twitter,
-			TwitterUsersProcessorProperties.Lookup lookup) {
-
-		return message -> {
-
-			try {
-				if (lookup.getScreenName() != null) {
-					String[] screenNames = lookup.getScreenName().getValue(message, String[].class);
-					return twitter.lookupUsers(screenNames);
-				}
-				else if (lookup.getScreenName() != null) {
-					long[] ids = lookup.getUserId().getValue(message, long[].class);
-					return twitter.lookupUsers(ids);
-				}
-			}
-			catch (TwitterException e) {
-				e.printStackTrace();
-			}
-			return null;
-		};
-	}
-
 }

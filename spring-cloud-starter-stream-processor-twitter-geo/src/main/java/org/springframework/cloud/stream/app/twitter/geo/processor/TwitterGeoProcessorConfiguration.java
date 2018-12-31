@@ -44,11 +44,11 @@ public class TwitterGeoProcessorConfiguration {
 
 	@Bean
 	public IntegrationFlow geoQueryFlow(Processor processor, Function<Message<?>, GeoQuery> toGeoQuery,
-			Function<GeoQuery, List<Place>> placesFunction, Function<List<Place>, String> toJson) {
+			Function<GeoQuery, List<Place>> places, Function<Object, Message<byte[]>> managedJson) {
 
 		return IntegrationFlows
 				.from(processor.input())
-				.transform(Message.class, toGeoQuery.andThen(placesFunction).andThen(toJson)::apply)
+				.transform(Message.class, toGeoQuery.andThen(places).andThen(managedJson)::apply)
 				.channel(processor.output()).get();
 	}
 }

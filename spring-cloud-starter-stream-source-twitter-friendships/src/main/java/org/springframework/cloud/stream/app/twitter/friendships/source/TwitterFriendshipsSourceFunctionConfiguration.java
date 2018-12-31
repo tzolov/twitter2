@@ -33,6 +33,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.stream.app.twitter.common.Cursor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.metadata.MetadataStore;
 import org.springframework.integration.metadata.SimpleMetadataStore;
 
@@ -40,6 +41,7 @@ import org.springframework.integration.metadata.SimpleMetadataStore;
  *
  * @author Christian Tzolov
  */
+@Configuration
 @EnableConfigurationProperties({ TwitterFriendshipsSourceProperties.class })
 public class TwitterFriendshipsSourceFunctionConfiguration {
 

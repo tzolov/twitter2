@@ -50,16 +50,13 @@ public class TwitterTrendLocationProcessorConfiguration {
 
 	private static final Log logger = LogFactory.getLog(TwitterTrendLocationProcessorConfiguration.class);
 
-	@Autowired
-	private Function<Message<?>, List<Location>> closestOrAvailableTrends;
-
-	@Autowired
-	private Function<Object, Message<byte[]>> managedJson;
-
 	// Use the spring.cloud.stream.function.definition to override the default function composition.
 	@Bean
 	@Conditional(OnMissingStreamFunctionDefinitionCondition.class)
-	public IntegrationFlow defaultProcessorFlow(Processor processor) {
+	public IntegrationFlow defaultProcessorFlow(Processor processor,
+			Function<Message<?>, List<Location>> closestOrAvailableTrends,
+			Function<Object, Message<byte[]>> managedJson) {
+
 		return IntegrationFlows
 				.from(processor.input())
 				.transform(Message.class, closestOrAvailableTrends.andThen(managedJson)::apply)

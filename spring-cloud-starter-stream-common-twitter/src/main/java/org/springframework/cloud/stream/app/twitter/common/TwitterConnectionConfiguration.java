@@ -79,7 +79,7 @@ public class TwitterConnectionConfiguration {
 	}
 
 	@Bean
-	public Function<Message<?>, Message<?>> normalizeStringPayload() {
+	public Function<Message<?>, Message<?>> stringifyPayload() {
 
 		return message -> {
 			if (message.getPayload() instanceof byte[]) {
@@ -135,7 +135,6 @@ public class TwitterConnectionConfiguration {
 			else {
 				return TwitterObjectFactory.getRawJSON(response);
 			}
-
 		};
 	}
 

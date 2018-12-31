@@ -24,7 +24,7 @@ public class TwitterConnectionConfigurationTests {
 	public void testBinaryContentType() {
 
 		Function<Message<?>, Message<?>> function =
-				new TwitterConnectionConfiguration().normalizeStringPayload();
+				new TwitterConnectionConfiguration().stringifyPayload();
 
 		String payload = "Test Binary Content";
 		Map<String, Object> headers = new HashedMap<>();
@@ -41,7 +41,7 @@ public class TwitterConnectionConfigurationTests {
 	public void testDefaultContentType() {
 
 		Function<Message<?>, Message<?>> function =
-				new TwitterConnectionConfiguration().normalizeStringPayload();
+				new TwitterConnectionConfiguration().stringifyPayload();
 
 		String payload = "Test Binary Content";
 		GenericMessage<byte[]> inMessage = new GenericMessage<>(payload.getBytes());
@@ -57,7 +57,7 @@ public class TwitterConnectionConfigurationTests {
 	@Test
 	public void testJsonContentType() {
 		Function<Message<?>, Message<?>> function =
-				new TwitterConnectionConfiguration().normalizeStringPayload();
+				new TwitterConnectionConfiguration().stringifyPayload();
 
 		String payload = "Test Binary Content";
 		Map<String, Object> headers = new HashedMap<>();

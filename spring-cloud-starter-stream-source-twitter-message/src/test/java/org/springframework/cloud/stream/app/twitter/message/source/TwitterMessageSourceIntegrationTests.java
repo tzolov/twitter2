@@ -17,25 +17,39 @@
 package org.springframework.cloud.stream.app.twitter.message.source;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Ignore;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockserver.client.MockServerClient;
+import org.mockserver.integration.ClientAndServer;
+import org.mockserver.model.Header;
+import org.mockserver.model.HttpRequest;
+import twitter4j.conf.ConfigurationBuilder;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.stream.app.test.twitter.TwitterTestUtils;
+import org.springframework.cloud.stream.app.twitter.common.TwitterConnectionProperties;
 import org.springframework.cloud.stream.messaging.Source;
 import org.springframework.cloud.stream.test.binder.MessageCollector;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.integration.support.MessageBuilder;
+import org.springframework.context.annotation.Primary;
 import org.springframework.messaging.Message;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import static org.mockserver.matchers.Times.exactly;
+import static org.mockserver.model.HttpRequest.request;
+import static org.mockserver.model.HttpResponse.response;
+import static org.mockserver.verify.VerificationTimes.once;
 
 /**
  * @author Christian Tzolov
@@ -45,11 +59,22 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(
 		webEnvironment = SpringBootTest.WebEnvironment.NONE,
 		properties = {
-				"debug=false",
-				"logging.level.*=INFO",
+				"twitter.connection.consumerKey=consumerKey666",
+				"twitter.connection.consumerSecret=consumerSecret666",
+				"twitter.connection.accessToken=accessToken666",
+				"twitter.connection.accessTokenSecret=accessTokenSecret666",
 		})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class TwitterMessageSourceIntegrationTests {
+
+	private static final String MOCK_SERVER_IP = "127.0.0.1";
+
+	private static final Integer MOCK_SERVER_PORT = 1080;
+
+	private static ClientAndServer mockServer;
+
+	private static MockServerClient mockClient;
+	private static HttpRequest messageRequest;
 
 	@Autowired
 	protected Source channels;
@@ -57,20 +82,49 @@ public abstract class TwitterMessageSourceIntegrationTests {
 	@Autowired
 	protected MessageCollector messageCollector;
 
+	@BeforeClass
+	public static void startServer() {
+		mockServer = ClientAndServer.startClientAndServer(MOCK_SERVER_PORT);
+		mockClient = new MockServerClient(MOCK_SERVER_IP, MOCK_SERVER_PORT);
+
+		messageRequest = setExpectation(request()
+				.withMethod("GET")
+				.withPath("/direct_messages/events/list.json")
+				.withQueryStringParameter("count", "15"));
+	}
+
+	@AfterClass
+	public static void stopServer() {
+		mockServer.stop();
+	}
+
 	@TestPropertySource(properties = {
-			"debug=true",
-			"logging.level.*=DEBUG",
+			"twitter.message.source.poll-interval=3000",
+			"twitter.message.source.count=15",
 	})
 	public static class TwitterMessagePayloadTests extends TwitterMessageSourceIntegrationTests {
 
-        @Ignore("TODO: Remove after test is implemented")
 		@Test
 		public void testOne() throws InterruptedException {
 
-			Message<?> received = messageCollector.forChannel(this.channels.output()).poll(10, TimeUnit.SECONDS);
-
+			Message<?> received = messageCollector.forChannel(
+					this.channels.output()).poll(60 * 4, TimeUnit.SECONDS);
+			mockClient.verify(messageRequest, once());
 			Assert.assertNotNull(received);
 		}
+	}
+
+	private static HttpRequest setExpectation(HttpRequest request) {
+		mockClient.when(request, exactly(1))
+				.respond(
+						response()
+								.withStatusCode(200)
+								.withHeaders(
+										new Header("Content-Type", "application/json; charset=utf-8"),
+										new Header("Cache-Control", "public, max-age=86400"))
+								.withBody(TwitterTestUtils.asString("classpath:/response/messages.json"))
+								.withDelay(TimeUnit.SECONDS, 10));
+		return request;
 	}
 
 	@SpringBootConfiguration
@@ -78,10 +132,18 @@ public abstract class TwitterMessageSourceIntegrationTests {
 	@Import(TwitterMessageSourceConfiguration.class)
 	public static class TestTwitterMessageSourceApplication {
 
-		//@Bean
-		//public Object myMockBean() {
-		// Create here your custom Mock instances to be used with this ITests
-		//}
+		@Bean
+		@Primary
+		public twitter4j.conf.Configuration twitterConfiguration2(TwitterConnectionProperties properties,
+				Function<TwitterConnectionProperties, ConfigurationBuilder> toConfigurationBuilder) {
+
+			Function<TwitterConnectionProperties, ConfigurationBuilder> mockedConfiguration =
+					toConfigurationBuilder.andThen(
+							new TwitterTestUtils().mockTwitterUrls(
+									String.format("http://%s:%s", MOCK_SERVER_IP, MOCK_SERVER_PORT)));
+
+			return mockedConfiguration.apply(properties).build();
+		}
 	}
 
 }

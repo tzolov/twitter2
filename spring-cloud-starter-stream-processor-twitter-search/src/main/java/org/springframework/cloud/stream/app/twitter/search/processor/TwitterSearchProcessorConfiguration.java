@@ -55,10 +55,10 @@ public class TwitterSearchProcessorConfiguration {
 	@Conditional(OnMissingStreamFunctionDefinitionCondition.class)
 	public IntegrationFlow defaultProcessorFlow(Processor processor,
 			Function<Message<?>, Query> query, Function<Query, List<Status>> search,
-			Function<Object, Message<byte[]>> json) {
+			Function<Object, Message<byte[]>> managedJson) {
 		return IntegrationFlows
 				.from(processor.input())
-				.transform(Message.class, query.andThen(search).andThen(json)::apply)
+				.transform(Message.class, query.andThen(search).andThen(managedJson)::apply)
 				.channel(processor.output())
 				.get();
 	}

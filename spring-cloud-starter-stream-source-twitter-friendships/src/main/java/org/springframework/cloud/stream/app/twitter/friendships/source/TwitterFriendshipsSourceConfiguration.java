@@ -40,17 +40,17 @@ import org.springframework.messaging.Message;
 public class TwitterFriendshipsSourceConfiguration {
 
 	@Autowired
-	private Function<Object, Message<byte[]>> json;
-
-	@Autowired
 	private Supplier<List<User>> userRetriever;
 
 	@Autowired
 	private Function<List<User>, List<User>> userDeduplication;
 
+	@Autowired
+	private Function<Object, Message<byte[]>> managedJson;
+
 	@InboundChannelAdapter(value = Source.OUTPUT,
 			poller = @Poller(fixedDelay = "${twitter.friendships.source.poll-interval:121000}", maxMessagesPerPoll = "1"))
 	public Message<byte[]> userRetrieval() {
-		return this.userDeduplication.andThen(json).apply(userRetriever.get());
+		return userDeduplication.andThen(managedJson).apply(userRetriever.get());
 	}
 }

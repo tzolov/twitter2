@@ -47,17 +47,17 @@ public class TwitterUpdateSinkConfiguration {
 
 	private static final Log logger = LogFactory.getLog(TwitterUpdateSinkConfiguration.class);
 
-	// Default function DSL, that is equivalent to: normalizeStringPayload|toStatusUpdateQuery|updateStatus
+	// Default function DSL, that is equivalent to: stringifyPayload|toStatusUpdateQuery|updateStatus
 	// Set the spring.cloud.stream.function.definition to override the default composition.
 	@Bean
 	@ConditionalOnMissingBean
 	@Conditional(OnMissingStreamFunctionDefinitionCondition.class)
-	public IntegrationFlow statusUpdateFlow(Sink sink, Function<Message<?>, Message<?>> normalizeStringPayload,
+	public IntegrationFlow statusUpdateFlow(Sink sink, Function<Message<?>, Message<?>> stringifyPayload,
 			Function<Message<?>, StatusUpdate> statusUpdateQuery, Consumer<StatusUpdate> updateStatus) {
 
 		return IntegrationFlows
 				.from(sink.input())
-				.transform(Message.class, normalizeStringPayload.andThen(statusUpdateQuery)::apply)
+				.transform(Message.class, stringifyPayload.andThen(statusUpdateQuery)::apply)
 				.handle(updateStatus)
 				.get();
 	}

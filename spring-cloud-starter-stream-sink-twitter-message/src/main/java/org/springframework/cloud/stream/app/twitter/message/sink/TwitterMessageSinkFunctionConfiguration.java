@@ -17,7 +17,6 @@
 package org.springframework.cloud.stream.app.twitter.message.sink;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,10 +24,8 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.stream.app.twitter.common.TwitterConnectionConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.messaging.Message;
 
 /**

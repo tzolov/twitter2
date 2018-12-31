@@ -100,19 +100,4 @@ public class TwitterGeoProcessorFunctionConfiguration {
 			return null;
 		};
 	}
-
-	@Bean
-	public Function<List<Place>, String> toJson(ObjectMapper mapper) {
-		return places -> {
-			try {
-				String json = mapper.writeValueAsString(places);
-				//System.out.println(json);
-				return json;
-			}
-			catch (JsonProcessingException e) {
-				logger.error("JSON parsing failed!", e);
-			}
-			return null;
-		};
-	}
 }

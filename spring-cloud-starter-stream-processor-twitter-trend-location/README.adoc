@@ -12,6 +12,8 @@ Response is an array of `locations` that encode the location's WOEID and some ot
 == Options
 
 //tag::configuration-properties[]
+$$twitter.trend.location.closest.lat$$:: $$If provided with a long parameter the available trend locations will be sorted by distance, nearest to furthest, to the co-ordinate pair. The valid ranges for longitude is -180.0 to +180.0 (West is negative, East is positive) inclusive.$$ *($$Expression$$, default: `$$<none>$$`)*
+$$twitter.trend.location.closest.lon$$:: $$If provided with a lat parameter the available trend locations will be sorted by distance, nearest to furthest, to the co-ordinate pair. The valid ranges for longitude is -180.0 to +180.0 (West is negative, East is positive) inclusive.$$ *($$Expression$$, default: `$$<none>$$`)*
 //end::configuration-properties[]
 
 //end::ref-doc[]

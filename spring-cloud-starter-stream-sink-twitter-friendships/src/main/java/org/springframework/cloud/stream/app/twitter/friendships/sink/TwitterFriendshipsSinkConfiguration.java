@@ -48,11 +48,11 @@ public class TwitterFriendshipsSinkConfiguration {
 	private Consumer<Message<?>> friendship;
 
 	@Autowired
-	private Function<Message<?>, Message<?>> normalizeStringPayload;
+	private Function<Message<?>, Message<?>> stringifyPayload;
 
 	@ServiceActivator(inputChannel = Sink.INPUT)
 	@Conditional(OnMissingStreamFunctionDefinitionCondition.class)
 	public void handle(Message<?> message) {
-		friendship.accept(normalizeStringPayload.apply(message));
+		friendship.accept(stringifyPayload.apply(message));
 	}
 }

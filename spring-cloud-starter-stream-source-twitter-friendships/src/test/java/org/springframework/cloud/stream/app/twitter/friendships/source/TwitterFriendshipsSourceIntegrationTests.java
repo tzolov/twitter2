@@ -135,7 +135,8 @@ public abstract class TwitterFriendshipsSourceIntegrationTests {
 
 	@TestPropertySource(properties = {
 			"twitter.friendships.source.type=followers",
-			"twitter.friendships.source.screenName=christzolov"
+			"twitter.friendships.source.screenName=christzolov",
+			"twitter.friendships.source.poll-interval=1000"
 	})
 	public static class TwitterFollowersTests extends TwitterFriendshipsSourceIntegrationTests {
 
@@ -143,7 +144,6 @@ public abstract class TwitterFriendshipsSourceIntegrationTests {
 		public void testOne() throws InterruptedException {
 
 			Message<?> received = messageCollector.forChannel(this.channels.output()).poll(60 * 4, TimeUnit.SECONDS);
-
 
 			mockClient.verify(request()
 							.withMethod("GET")
@@ -208,5 +208,4 @@ public abstract class TwitterFriendshipsSourceIntegrationTests {
 			return mockedConfiguration.apply(properties).build();
 		}
 	}
-
 }

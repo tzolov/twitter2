@@ -80,7 +80,8 @@ public class TwitterMessageSourceFunctionConfiguration {
 			Twitter twitter, MessageCursor cursorState) {
 		return () -> {
 			try {
-				DirectMessageList messages = (cursorState.getCursor() != null) ?
+				String cs = cursorState.getCursor();
+				DirectMessageList messages = (cursorState.getCursor() == null) ?
 						twitter.getDirectMessages(properties.getCount()) :
 						twitter.getDirectMessages(properties.getCount(), cursorState.getCursor());
 

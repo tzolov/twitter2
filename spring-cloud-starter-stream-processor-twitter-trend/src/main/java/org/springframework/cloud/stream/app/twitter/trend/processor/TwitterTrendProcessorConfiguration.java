@@ -22,7 +22,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import twitter4j.Trends;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.app.twitter.common.OnMissingStreamFunctionDefinitionCondition;
 import org.springframework.cloud.stream.app.twitter.common.TwitterConnectionConfiguration;
@@ -45,16 +44,12 @@ public class TwitterTrendProcessorConfiguration {
 
 	private static final Log logger = LogFactory.getLog(TwitterTrendProcessorConfiguration.class);
 
-	@Autowired
-	private Function<Message<?>, Trends> trend;
-
-	@Autowired
-	private Function<Object, Message<byte[]>> managedJson;
-
 	// Use the spring.cloud.stream.function.definition to override the default function composition.
 	@Bean
 	@Conditional(OnMissingStreamFunctionDefinitionCondition.class)
-	public IntegrationFlow defaultProcessorFlow(Processor processor) {
+	public IntegrationFlow defaultProcessorFlow(Processor processor,
+			Function<Message<?>, Trends> trend, Function<Object, Message<byte[]>> managedJson) {
+
 		return IntegrationFlows
 				.from(processor.input())
 				.transform(Message.class, trend.andThen(managedJson)::apply)
