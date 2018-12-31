@@ -1,6 +1,9 @@
 //tag::ref-doc[]
-= TwitterMessage Source
+= Twitter Message Source
 
+Repeatedly retrieves the direct messages (both sent and received) within the last 30 days, sorted in reverse-chronological order.
+The relieved messages are cached (in a `MetadataStore` cache) to prevent duplications.
+By default an in-memory `SimpleMetadataStore` is used.
 
 == Options
 

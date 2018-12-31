@@ -48,7 +48,7 @@ include::spring-cloud-starter-stream-sink-twitter-update/README.adoc[]
 # Direct Message
 
 ### twitter-message source
-*Description*: TODO
+Repeatedly retrieves the direct messages (both sent and received) within the last 30 days, using cache to prevent message duplications.
 
 include::spring-cloud-starter-stream-source-twitter-message/README.adoc[]
 
